@@ -1,0 +1,198 @@
+--[[
+    AUTO SPAM CHAT - Delta Executor
+    Fitur: Edit Text, Delay, Run/Stop
+]]
+
+-- Load screen
+local player = game:GetService("Players").LocalPlayer
+local gui = Instance.new("ScreenGui")
+local frame = Instance.new("Frame")
+local title = Instance.new("TextLabel")
+local txtPesan = Instance.new("TextBox")
+local txtDelay = Instance.new("TextBox")
+local btnRun = Instance.new("TextButton")
+local btnStop = Instance.new("TextButton")
+local status = Instance.new("TextLabel")
+
+-- Setup GUI
+gui.Name = "SpamChat"
+gui.Parent = game:GetService("CoreGui")
+gui.ResetOnSpawn = false
+
+-- Frame utama
+frame.Parent = gui
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.BorderSizePixel = 2
+frame.BorderColor3 = Color3.fromRGB(255, 0, 0)
+frame.Position = UDim2.new(0.7, 0, 0.3, 0)
+frame.Size = UDim2.new(0, 300, 0, 200)
+frame.Active = true
+frame.Draggable = true
+
+-- Judul
+title.Parent = frame
+title.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+title.Size = UDim2.new(1, 0, 0, 30)
+title.Font = Enum.Font.SourceSansBold
+title.Text = "AUTO SPAM CHAT"
+title.TextColor3 = Color3.fromRGB(255, 0, 0)
+title.TextSize = 20
+
+-- Label Pesan
+local lblPesan = Instance.new("TextLabel")
+lblPesan.Parent = frame
+lblPesan.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+lblPesan.Position = UDim2.new(0, 10, 0, 40)
+lblPesan.Size = UDim2.new(0, 50, 0, 25)
+lblPesan.Font = Enum.Font.SourceSans
+lblPesan.Text = "Pesan:"
+lblPesan.TextColor3 = Color3.fromRGB(255, 255, 255)
+lblPesan.TextSize = 16
+
+-- TextBox Pesan
+txtPesan.Parent = frame
+txtPesan.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+txtPesan.Position = UDim2.new(0, 70, 0, 40)
+txtPesan.Size = UDim2.new(0, 210, 0, 25)
+txtPesan.Font = Enum.Font.SourceSans
+txtPesan.PlaceholderText = "Teks yang mau dispam"
+txtPesan.Text = ""
+txtPesan.TextColor3 = Color3.fromRGB(255, 255, 255)
+txtPesan.TextSize = 14
+
+-- Label Delay
+local lblDelay = Instance.new("TextLabel")
+lblDelay.Parent = frame
+lblDelay.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+lblDelay.Position = UDim2.new(0, 10, 0, 75)
+lblDelay.Size = UDim2.new(0, 50, 0, 25)
+lblDelay.Font = Enum.Font.SourceSans
+lblDelay.Text = "Delay:"
+lblDelay.TextColor3 = Color3.fromRGB(255, 255, 255)
+lblDelay.TextSize = 16
+
+-- TextBox Delay
+txtDelay.Parent = frame
+txtDelay.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+txtDelay.Position = UDim2.new(0, 70, 0, 75)
+txtDelay.Size = UDim2.new(0, 210, 0, 25)
+txtDelay.Font = Enum.Font.SourceSans
+txtDelay.PlaceholderText = "Detik (contoh: 1)"
+txtDelay.Text = "1"
+txtDelay.TextColor3 = Color3.fromRGB(255, 255, 255)
+txtDelay.TextSize = 14
+
+-- Status
+status.Parent = frame
+status.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+status.Position = UDim2.new(0, 10, 0, 110)
+status.Size = UDim2.new(0, 280, 0, 25)
+status.Font = Enum.Font.SourceSans
+status.Text = "Status: STOP"
+status.TextColor3 = Color3.fromRGB(255, 100, 100)
+status.TextSize = 16
+
+-- Tombol RUN
+btnRun.Parent = frame
+btnRun.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+btnRun.Position = UDim2.new(0, 20, 0, 145)
+btnRun.Size = UDim2.new(0, 120, 0, 35)
+btnRun.Font = Enum.Font.SourceSansBold
+btnRun.Text = "RUN"
+btnRun.TextColor3 = Color3.fromRGB(255, 255, 255)
+btnRun.TextSize = 18
+
+-- Tombol STOP
+btnStop.Parent = frame
+btnStop.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+btnStop.Position = UDim2.new(0, 160, 0, 145)
+btnStop.Size = UDim2.new(0, 120, 0, 35)
+btnStop.Font = Enum.Font.SourceSansBold
+btnStop.Text = "STOP"
+btnStop.TextColor3 = Color3.fromRGB(255, 255, 255)
+btnStop.TextSize = 18
+
+-- Variable untuk spam
+local spamActive = false
+local spamLoop
+
+-- Fungsi spam
+local function mulaiSpam()
+    local pesan = txtPesan.Text
+    local delay = tonumber(txtDelay.Text)
+    
+    -- Validasi
+    if pesan == "" then
+        status.Text = "Status: Pesan kosong!"
+        return
+    end
+    
+    if not delay or delay < 0.1 then
+        status.Text = "Status: Delay minimal 0.1!"
+        return
+    end
+    
+    if spamActive then
+        return
+    end
+    
+    spamActive = true
+    status.Text = "Status: SPAM AKTIF"
+    status.TextColor3 = Color3.fromRGB(0, 255, 0)
+    btnRun.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+    
+    -- Loop spam
+    spamLoop = game:GetService("RunService").Heartbeat:Connect(function()
+        if spamActive then
+            pcall(function()
+                -- Method chat yang umum
+                game:GetService("ReplicatedStorage"):FindFirstChild("DefaultChatSystemChatEvents") and 
+                game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents:FindFirstChild("SayMessageRequest") and
+                game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(pesan, "All")
+            end)
+            wait(delay)
+        end
+    end)
+end
+
+-- Fungsi stop
+local function stopSpam()
+    if spamActive then
+        spamActive = false
+        if spamLoop then
+            spamLoop:Disconnect()
+            spamLoop = nil
+        end
+        status.Text = "Status: STOP"
+        status.TextColor3 = Color3.fromRGB(255, 100, 100)
+        btnRun.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+    end
+end
+
+-- Event tombol
+btnRun.MouseButton1Click:Connect(mulaiSpam)
+btnStop.MouseButton1Click:Connect(stopSpam)
+
+-- Tombol close
+local closeBtn = Instance.new("TextButton")
+closeBtn.Parent = frame
+closeBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+closeBtn.Position = UDim2.new(1, -25, 0, 5)
+closeBtn.Size = UDim2.new(0, 20, 0, 20)
+closeBtn.Font = Enum.Font.SourceSansBold
+closeBtn.Text = "X"
+closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeBtn.TextSize = 16
+closeBtn.MouseButton1Click:Connect(function()
+    stopSpam()
+    gui:Destroy()
+end)
+
+-- Notifikasi
+game:GetService("StarterGui"):SetCore("SendNotification", {
+    Title = "Auto Spam Chat";
+    Text = "Script siap digunakan!";
+    Duration = 2;
+})
+
+print("Auto Spam Chat berhasil di load!")
